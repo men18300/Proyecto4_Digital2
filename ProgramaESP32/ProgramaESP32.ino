@@ -5,12 +5,23 @@
   https://lastminuteengineers.com/creating-esp32-web-server-arduino-ide/
   https://electropeak.com/learn
 **************************************************************************************************/
+//Universidad del Valle de Guatemala
+//Depto. de Ingenieria Mecatronica y Electronica
+//Curso de Digital 2
+//Seccion 20
+//Prof. Pablo Mazariegos
+//Prof. Kurt Kellner
+//Diego Mencos
+//Carne 18300
+
+
 //************************************************************************************************
 // Librerías
 //************************************************************************************************
 #include <WiFi.h>
 #include <WebServer.h>
 #include <SPIFFS.h>
+
 //************************************************************************************************
 // Variables globales
 //************************************************************************************************
@@ -57,6 +68,7 @@ void setup() {
   Serial.println("HTTP server started");
   delay(100);
 }
+
 //************************************************************************************************
 // loop principal
 //************************************************************************************************
@@ -71,6 +83,7 @@ void loop() {
     digitalWrite(LED1pin, LOW);
   }
 }
+
 //************************************************************************************************
 // Handler de Inicio página
 //************************************************************************************************
@@ -79,6 +92,7 @@ void handle_OnConnect() {
   Serial.println("GPIO2 Status: OFF");
   server.send(200, "text/html", SendHTML(LED1status));
 }
+
 //************************************************************************************************
 // Handler de led1on
 //************************************************************************************************
@@ -87,6 +101,7 @@ void handle_led1on() {
   Serial.println("GPIO2 Status: ON");
   server.send(200, "text/html", SendHTML(LED1status));
 }
+
 //************************************************************************************************
 // Handler de led1off
 //************************************************************************************************
@@ -95,15 +110,17 @@ void handle_led1off() {
   Serial.println("GPIO2 Status: OFF");
   server.send(200, "text/html", SendHTML(LED1status));
 }
+
 //************************************************************************************************
 // Procesador de HTML
 //************************************************************************************************
 String SendHTML(uint8_t led1stat) {
   String ptr = "<!DOCTYPE html> <html>\n";
   ptr += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-  ptr += "<title>LED Control</title>\n";
+  ptr += "<title>Proyecto 4</title>\n";
+  ptr += "<body bgcolor=#101010>";
   ptr += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-  ptr += "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
+  ptr += "body {margin-top: 50px;} h1 {color: #FFFFFF;margin: 50px auto 30px;} h3 {color: #FFFFFF;margin-bottom: 50px;}\n";
   ptr += ".button {display: block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n";
   ptr += ".button-on {background-color: #3498db;}\n";
   ptr += ".button-on:active {background-color: #2980b9;}\n";
@@ -113,8 +130,10 @@ String SendHTML(uint8_t led1stat) {
   ptr += "</style>\n";
   ptr += "</head>\n";
   ptr += "<body>\n";
-  ptr += "<h1>ESP32 Web Server &#128664</h1>\n";
+  ptr += "<h1>ParqueoMatic-Prototipo &#128664</h1>\n";
   ptr += "<h3>Ejemplo de Web Server</h3>\n";
+  ptr += "<h2>HTML Image</h2>";
+  ptr += "<img src="data/carro.jpg" alt=carro width=500 height=333>";
 
   if (led1stat)
   {
@@ -129,6 +148,7 @@ String SendHTML(uint8_t led1stat) {
   ptr += "</html>\n";
   return ptr;
 }
+
 //************************************************************************************************
 // Handler de not found
 //************************************************************************************************
