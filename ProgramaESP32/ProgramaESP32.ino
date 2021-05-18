@@ -29,6 +29,10 @@
 const char* ssid = "TURBONETT_523";  // Enter your SSID here
 const char* password = "a4c564b0c0";  //Enter your Password here
 
+
+#define RXD2 16
+#define TXD2 17
+
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is default)
 
 
@@ -40,6 +44,12 @@ bool LED1status = LOW;
 //************************************************************************************************
 void setup() {
   Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+
+
+  while (!Serial);
+  while (!Serial2);
+  
   Serial.println("Try Connecting to ");
   Serial.println(ssid);
 
@@ -74,6 +84,17 @@ void setup() {
 //************************************************************************************************
 void loop() {
   server.handleClient();
+
+  if(Serial2.available()>0){
+     Serial.println(Serial2.read());
+     }
+
+
+ //char recibido=Serial2.read();
+ //Serial.print(recibido);
+
+   
+
   if (LED1status)
   {
     digitalWrite(LED1pin, HIGH);
@@ -121,6 +142,22 @@ String SendHTML(uint8_t led1stat) {
   ptr += "<body bgcolor=#101010>";
   ptr += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
   ptr += "body {margin-top: 50px;} h1 {color: #FFFFFF;margin: 50px auto 30px;} h3 {color: #FFFFFF;margin-bottom: 50px;}\n";
+ptr += "table {";
+ptr += "  font-family: Helvetica, sans-serif;";
+ptr += "  border-collapse: collapse;";
+ptr += "  width: 100%;";
+ptr += "  margin: 50px auto 30px;";
+ptr += "  text-align: center;";
+ptr += "}";
+ptr += "td, th {";
+ ptr += " border: 1px solid #101010;";
+ ptr += " text-align: center;";
+ ptr += " padding: 8px;  ";
+ptr += "  background-color: #008080;";
+ptr += "}";
+ptr += "tr:nth-child(even) {";
+ptr += "  background-color: #FFFFFF;";
+ptr += "}  ";
   ptr += ".button {display: block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n";
   ptr += ".button-on {background-color: #3498db;}\n";
   ptr += ".button-on:active {background-color: #2980b9;}\n";
@@ -132,8 +169,29 @@ String SendHTML(uint8_t led1stat) {
   ptr += "<body>\n";
   ptr += "<h1>ParqueoMatic-Prototipo &#128664</h1>\n";
   ptr += "<h3>Ejemplo de Web Server</h3>\n";
-  ptr += "<h2>HTML Image</h2>";
-  ptr += "<img src="data/carro.jpg" alt=carro width=500 height=333>";
+  ptr += "<h2> </h2>";
+ptr += "<table>";
+ ptr += " <table style= margin: 0 auto;>";
+ ptr += " <tr>";
+ ptr += "   <th>Parqueo 1</th>";
+ ptr += "   <th>Parqueo 2 </th>";
+ ptr += "   <th>Parqueo 3 </th>";
+ ptr += "   <th>Parqueo 4</th>";
+ ptr += " </tr>";
+ ptr += " <tr>";
+ ptr += "   <td>Libre</td>";
+ ptr += "   <td>Ocupado</td>";
+ ptr += "   <td>Libre</td>";
+ ptr += "   <td>Ocupado</td>";
+ptr += "  </tr>";
+ptr += "  <tr>";
+ptr += "    <td>Rojo</td>";
+  ptr += "  <td> Rojo</td>";
+ ptr += "   <td>Rojo</td>";
+ ptr += "   <td>Rojo</td>";
+ ptr += " </tr>";
+ptr += "</table>";
+
 
   if (led1stat)
   {
