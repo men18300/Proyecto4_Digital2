@@ -35,6 +35,11 @@ const char* password = "a4c564b0c0";  //Enter your Password here
 
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is default)
 
+int dato=0;
+bool parqueo1=LOW;
+bool parqueo2=LOW;
+bool parqueo3=LOW;
+bool parqueo4=LOW;
 
 uint8_t LED1pin = 2;
 bool LED1status = LOW;
@@ -44,7 +49,7 @@ bool LED1status = LOW;
 //************************************************************************************************
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+  Serial2.begin(115200,SERIAL_8N1,RXD2,TXD2);
 
 
   while (!Serial);
@@ -86,12 +91,14 @@ void loop() {
   server.handleClient();
 
   if(Serial2.available()>0){
-     Serial.println(Serial2.read());
+     dato=Serial2.read();
+    // Serial.println(Serial2.read());
+     Serial.println(dato);
      }
 
-
- //char recibido=Serial2.read();
- //Serial.print(recibido);
+  if (dato==108){
+    parqueo1=HIGH;
+    }
 
    
 
@@ -141,7 +148,7 @@ String SendHTML(uint8_t led1stat) {
   ptr += "<title>Proyecto 4</title>\n";
   ptr += "<body bgcolor=#101010>";
   ptr += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-  ptr += "body {margin-top: 50px;} h1 {color: #FFFFFF;margin: 50px auto 30px;} h3 {color: #FFFFFF;margin-bottom: 50px;}\n";
+  ptr += "body {margin-top: 50px;} h1 {color: #FFFFFF;margin: 50px auto 30px;}  h4 {color: #FFFFFF;margin: 15px;} h3 {color: #FFFFFF;margin-bottom: 15px;}\n";
 ptr += "table {";
 ptr += "  font-family: Helvetica, sans-serif;";
 ptr += "  border-collapse: collapse;";
@@ -168,38 +175,58 @@ ptr += "}  ";
   ptr += "</head>\n";
   ptr += "<body>\n";
   ptr += "<h1>ParqueoMatic-Prototipo &#128664</h1>\n";
-  ptr += "<h3>Ejemplo de Web Server</h3>\n";
+  ptr += "<h3>Diego Mencos - 18300 </h3>\n";
+      ptr += "<h4>Proyecto 4 </h1>\n";
   ptr += "<h2> </h2>";
 ptr += "<table>";
  ptr += " <table style= margin: 0 auto;>";
  ptr += " <tr>";
- ptr += "   <th>Parqueo 1</th>";
- ptr += "   <th>Parqueo 2 </th>";
- ptr += "   <th>Parqueo 3 </th>";
- ptr += "   <th>Parqueo 4</th>";
+ ptr += "   <th><span style='font-size:30px;'>Parqueo 1</th>";
+ ptr += "   <th><span style='font-size:30px;'>Parqueo 2 </th>";
+ ptr += "   <th><span style='font-size:30px;'>Parqueo 3 </th>";
+ ptr += "   <th><span style='font-size:30px;'>Parqueo 4</th>";
  ptr += " </tr>";
- ptr += " <tr>";
- ptr += "   <td>Libre</td>";
- ptr += "   <td>Ocupado</td>";
- ptr += "   <td>Libre</td>";
- ptr += "   <td>Ocupado</td>";
-ptr += "  </tr>";
 ptr += "  <tr>";
-ptr += "    <td>Rojo</td>";
-  ptr += "  <td> Rojo</td>";
- ptr += "   <td>Rojo</td>";
- ptr += "   <td>Rojo</td>";
- ptr += " </tr>";
+
+//ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+//ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+//ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+//ptr +=" <td> <span style='font-size:60px;'>&#10060;</span></td>";
+
+if(parqueo1==HIGH){
+  ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
+else if (parqueo2==LOW){
+  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+
+if(parqueo2==HIGH){
+  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
+else if (parqueo2==LOW){
+  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+
+if(parqueo3==HIGH){
+  ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
+else if (parqueo2==LOW){
+  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+
+if(parqueo4==HIGH){
+  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
+else if (parqueo2==LOW){
+  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+
+
+
+ptr += " </tr>";
 ptr += "</table>";
+
 
 
   if (led1stat)
   {
-    ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
+    ptr += "<p>Presione el boton para refrescar la pagina.</p><a class=\"button button-off\" href=\"/led1off\">ACT</a>\n";
   }
   else
   {
-    ptr += "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
+    ptr += "<p>Presione el boton para refrescar la pagina.</p><a class=\"button button-on\" href=\"/led1on\">ACT</a>\n";
   }
 
   ptr += "</body>\n";
