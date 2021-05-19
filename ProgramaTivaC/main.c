@@ -22,6 +22,11 @@
 
 //Variables a usar en el programa
 int status2=1;
+int contador=0;
+int parqueo1=0;
+int parqueo2=0;
+int parqueo3=0;
+int parqueo4=0;
 
 
 //Prototipo de funciones
@@ -29,6 +34,7 @@ void UARTIntHandler(void); //funcion interrupcion cuando se recibe un dato por U
 void InitUART(void); //funcion de configuracion UART
 void InitUART1(void);
 void InitUART2(void);
+void LEDsparqueo(void);
 void delayMs(uint32_t ui32Ms);
 
 
@@ -59,7 +65,6 @@ int main(void) {
                 //funcion de toggle del led
         status2 = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4);
         if (status2==0){
-           // delayMs(500);
             GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 6); //Rojo
             UARTCharPut(UART1_BASE, 'l');
             delayMs(1000);
@@ -99,9 +104,9 @@ void InitUART1(void){
     /*Enable the peripheral UART Module 0*/
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
 
-    GPIOPinConfigure(GPIO_PC4_U1RX);
+    //Establecemos los pines RX/C4 y TX/C5
     GPIOPinConfigure(GPIO_PC5_U1TX);
-
+    GPIOPinConfigure(GPIO_PC4_U1RX);
 
     /* Make the UART pins be peripheral controlled. */
     GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
@@ -152,7 +157,41 @@ void UARTIntHandler(){
 }
 
 
+void LEDsparqueo(void){
+    if(parqueo1== 1 ){
 
+
+    }
+    else if (parqueo1==0){
+
+
+    }
+    if(parqueo2==1){
+
+    }
+    else if (parqueo2==0){
+
+    }
+    if(parqueo3==1){
+
+    }
+    else if (parqueo3==0){
+
+    }
+    if(parqueo4==1){
+
+    }
+    else if (parqueo4==0){
+
+    }
+
+    contador=parqueo1+parqueo2+parqueo3+parqueo4;
+    if (contador==0){}
+    else if (contador==2){}
+    else if (contador==3){}
+    else if (contador==4){}
+    else {}
+}
 
 
 //Este delay sirve para poder utilizar el delay que traen las librerias pero con un
@@ -166,5 +205,7 @@ void delayMs(uint32_t ui32Ms) {
 
     SysCtlDelay(ui32Ms * (SysCtlClockGet() / 3 / 1000));
 }
+
+
 
 
