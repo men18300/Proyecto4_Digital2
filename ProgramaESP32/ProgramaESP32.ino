@@ -1,7 +1,7 @@
 /*************************************************************************************************
   ESP32 Web Server
-  Ejemplo de creación de Web server 
-  Basándose en los ejemplos de: 
+  Ejemplo de creación de Web server
+  Basándose en los ejemplos de:
   https://lastminuteengineers.com/creating-esp32-web-server-arduino-ide/
   https://electropeak.com/learn
 **************************************************************************************************/
@@ -35,26 +35,27 @@ const char* password = "a4c564b0c0";  //Enter your Password here
 
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is default)
 
-int dato=0;
-bool parqueo1=LOW;
-bool parqueo2=LOW;
-bool parqueo3=LOW;
-bool parqueo4=LOW;
+int dato = 0;
+bool parqueo1 = LOW;
+bool parqueo2 = LOW;
+bool parqueo3 = LOW;
+bool parqueo4 = LOW;
 
 uint8_t LED1pin = 2;
 bool LED1status = LOW;
+int contador = 0;
 
 //************************************************************************************************
 // Configuración
 //************************************************************************************************
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(115200,SERIAL_8N1,RXD2,TXD2);
+  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
 
 
   while (!Serial);
   while (!Serial2);
-  
+
   Serial.println("Try Connecting to ");
   Serial.println(ssid);
 
@@ -76,7 +77,7 @@ void setup() {
   server.on("/", handle_OnConnect); // Directamente desde e.g. 192.168.0.8
   server.on("/led1on", handle_led1on);
   server.on("/led1off", handle_led1off);
-  
+
   server.onNotFound(handle_NotFound);
 
   server.begin();
@@ -88,19 +89,36 @@ void setup() {
 // loop principal
 //************************************************************************************************
 void loop() {
+
+  //Serial.println(contador);
   server.handleClient();
 
-  if(Serial2.available()>0){
-     dato=Serial2.read();
+  if (Serial2.available() > 0) {
+    dato = Serial2.read();
     // Serial.println(Serial2.read());
-     Serial.println(dato);
-     }
+    Serial.println(dato);
+  }
 
-  if (dato==108){
-    parqueo1=HIGH;
-    }
+  if (dato == 97) {
+    parqueo1 = HIGH;
+  }
+  else if (dato == 98) {
+    parqueo1 = LOW;
+  }
+  if (dato == 99) {
+    parqueo2 = HIGH;
+  }
+  else if (dato == 100) {
+    parqueo2 = LOW;
+  }
+  if (dato == 101) {
+    parqueo3 = HIGH;
+  }
+  else if (dato == 102) {
+    parqueo3 = LOW;
+  }
 
-   
+
 
   if (LED1status)
   {
@@ -149,22 +167,22 @@ String SendHTML(uint8_t led1stat) {
   ptr += "<body bgcolor=#101010>";
   ptr += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
   ptr += "body {margin-top: 50px;} h1 {color: #FFFFFF;margin: 50px auto 30px;}  h4 {color: #FFFFFF;margin: 15px;} h3 {color: #FFFFFF;margin-bottom: 15px;}\n";
-ptr += "table {";
-ptr += "  font-family: Helvetica, sans-serif;";
-ptr += "  border-collapse: collapse;";
-ptr += "  width: 100%;";
-ptr += "  margin: 50px auto 30px;";
-ptr += "  text-align: center;";
-ptr += "}";
-ptr += "td, th {";
- ptr += " border: 1px solid #101010;";
- ptr += " text-align: center;";
- ptr += " padding: 8px;  ";
-ptr += "  background-color: #008080;";
-ptr += "}";
-ptr += "tr:nth-child(even) {";
-ptr += "  background-color: #FFFFFF;";
-ptr += "}  ";
+  ptr += "table {";
+  ptr += "  font-family: Helvetica, sans-serif;";
+  ptr += "  border-collapse: collapse;";
+  ptr += "  width: 100%;";
+  ptr += "  margin: 50px auto 30px;";
+  ptr += "  text-align: center;";
+  ptr += "}";
+  ptr += "td, th {";
+  ptr += " border: 1px solid #101010;";
+  ptr += " text-align: center;";
+  ptr += " padding: 8px;  ";
+  ptr += "  background-color: #008080;";
+  ptr += "}";
+  ptr += "tr:nth-child(even) {";
+  ptr += "  background-color: #FFFFFF;";
+  ptr += "}  ";
   ptr += ".button {display: block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n";
   ptr += ".button-on {background-color: #3498db;}\n";
   ptr += ".button-on:active {background-color: #2980b9;}\n";
@@ -176,52 +194,61 @@ ptr += "}  ";
   ptr += "<body>\n";
   ptr += "<h1>ParqueoMatic-Prototipo &#128664</h1>\n";
   ptr += "<h3>Diego Mencos - 18300 </h3>\n";
-      ptr += "<h4>Proyecto 4 </h1>\n";
+  ptr += "<h4>Proyecto 4 </h1>\n";
   ptr += "<h2> </h2>";
-ptr += "<table>";
- ptr += " <table style= margin: 0 auto;>";
- ptr += " <tr>";
- ptr += "   <th><span style='font-size:30px;'>Parqueo 1</th>";
- ptr += "   <th><span style='font-size:30px;'>Parqueo 2 </th>";
- ptr += "   <th><span style='font-size:30px;'>Parqueo 3 </th>";
- ptr += "   <th><span style='font-size:30px;'>Parqueo 4</th>";
- ptr += " </tr>";
-ptr += "  <tr>";
+  ptr += "<table>";
+  ptr += " <table style= margin: 0 auto;>";
+  ptr += " <tr>";
+  ptr += "   <th><span style='font-size:30px;'>Parqueo 1</th>";
+  ptr += "   <th><span style='font-size:30px;'>Parqueo 2 </th>";
+  ptr += "   <th><span style='font-size:30px;'>Parqueo 3 </th>";
+  ptr += "   <th><span style='font-size:30px;'>Parqueo 4</th>";
+  ptr += " </tr>";
+  ptr += "  <tr>";
 
-//ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
-//ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
-//ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
-//ptr +=" <td> <span style='font-size:60px;'>&#10060;</span></td>";
+  //ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  //ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+  //ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  //ptr +=" <td> <span style='font-size:60px;'>&#10060;</span></td>";
 
-if(parqueo1==HIGH){
-  ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
-else if (parqueo2==LOW){
-  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+  if (parqueo1 == HIGH) {
+    ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  }
+  else if (parqueo1 == LOW) {
+    ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+  }
 
-if(parqueo2==HIGH){
-  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
-else if (parqueo2==LOW){
-  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+  if (parqueo2 == HIGH) {
+   ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  }
+  else if (parqueo2 == LOW) {
+    ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+  }
 
-if(parqueo3==HIGH){
-  ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
-else if (parqueo2==LOW){
-  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+  if (parqueo3 == HIGH) {
+    ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  }
+  else if (parqueo3 == LOW) {
+    ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+  }
 
-if(parqueo4==HIGH){
-  "<td> <span style='font-size:60px;'> &#9989;</span></td>";}
-else if (parqueo2==LOW){
-  ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";} 
+  if (parqueo4 == HIGH) {
+    ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
+  }
+  else if (parqueo4 == LOW) {
+    ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
+  }
 
 
 
-ptr += " </tr>";
-ptr += "</table>";
+  ptr += " </tr>";
+  ptr += "</table>";
 
 
 
   if (led1stat)
   {
+
     ptr += "<p>Presione el boton para refrescar la pagina.</p><a class=\"button button-off\" href=\"/led1off\">ACT</a>\n";
   }
   else
