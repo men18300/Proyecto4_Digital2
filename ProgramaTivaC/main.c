@@ -11,6 +11,7 @@
 #include<stdint.h>
 #include<stdbool.h>
 #include"inc/hw_memmap.h"
+#include"inc/hw_types.h"
 #include"inc/tm4c123gh6pm.h"
 #include"driverlib/sysctl.h"
 #include"driverlib/gpio.h"
@@ -18,10 +19,20 @@
 #include"driverlib/interrupt.h"
 #include "driverlib/uart.h"
 #include "driverlib/pin_map.h"
+#include "inc/hw_gpio.h"
 
 
 //Variables a usar en el programa
+int status1=1;
 int status2=1;
+int status3=1;
+int status4=1;
+
+int status1prev=1;
+int status2prev=1;
+int status3prev=1;
+int status4prev=1;
+
 int contador=0;
 int parqueo1=0;
 int parqueo2=0;
@@ -49,11 +60,31 @@ int main(void) {
     //Habilitar periférico GPIO F
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     //Habilitar pines de salida y entrada
+
+    //Habilitar periférico GPIO C
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    //Habilitar pines de salida y entrada
+    //Habilitar periférico GPIO C
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    //Habilitar pines de salida y entrada
+
+    GPIOPinConfigure(GPIO_PD6_WT5CCP0);
+    GPIOPinConfigure(GPIO_PC7_WT1CCP1);
+
+
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
 
     GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4);
     //Configura los pushbuttoms con weak pull-up
+
+  //  GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_7);
+    GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_6);
+    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_7);
+    //Configura los pushbuttoms con weak pull-up
+
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_6, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     //IntEnable(INT_UART2);
     //IntMasterEnable();
@@ -63,12 +94,55 @@ int main(void) {
     //loop infinito
     while (1){
                 //funcion de toggle del led
-        status2 = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4);
-        if (status2==0){
-            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 6); //Rojo
-            UARTCharPut(UART1_BASE, 'l');
-            delayMs(1000);
+        status3 = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_6);
+        status1 = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4);
+        status2 = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_7);
+
+
+        if (status1prev!=status1){
+            status1prev=status1;
+            if (status1==0){
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8); //Rojo
+                        UARTCharPut(UART1_BASE, 'a');
+                        //delayMs(1000);
+                    }
+                        else {
+                            UARTCharPut(UART1_BASE, 'b');
+                          //  delayMs(500);
+                        }
         }
+
+
+        if (status2prev!=status2){
+            status2prev=status2;
+            if (status2==0){
+          GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 6); //Rojo
+          UARTCharPut(UART1_BASE, 'c');
+          //delayMs(1000);
+      }
+      else {
+          UARTCharPut(UART1_BASE, 'd');
+         // delayMs(500);
+      }
+
+        }
+
+        if (status3prev!=status3){
+            status3prev=status3;
+            if (status3==0){
+                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 10); //amarillo
+                UARTCharPut(UART1_BASE, 'e');
+             // delayMs(1000);
+           }
+            else if (status3==1){
+                UARTCharPut(UART1_BASE, 'f');
+               // delayMs(500);
+            }
+
+
+        }
+
+
             else{
                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0); //Rojo
             }
