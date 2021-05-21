@@ -36,10 +36,10 @@ const char* password = "a4c564b0c0";  //Enter your Password here
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is default)
 
 int dato = 0;
-bool parqueo1 = LOW;
-bool parqueo2 = LOW;
-bool parqueo3 = LOW;
-bool parqueo4 = LOW;
+bool parqueo1 = HIGH;
+bool parqueo2 = HIGH;
+bool parqueo3 = HIGH;
+bool parqueo4 = HIGH;
 
 uint8_t LED1pin = 2;
 bool LED1status = LOW;
@@ -100,24 +100,29 @@ void loop() {
   }
 
   if (dato == 97) {
-    parqueo1 = HIGH;
-  }
-  else if (dato == 98) {
     parqueo1 = LOW;
   }
-  if (dato == 99) {
-    parqueo2 = HIGH;
+  else if (dato == 98) {
+    parqueo1 = HIGH;
   }
-  else if (dato == 100) {
+  if (dato == 99) {
     parqueo2 = LOW;
   }
-  if (dato == 101) {
-    parqueo3 = HIGH;
+  else if (dato == 100) {
+    parqueo2 = HIGH;
   }
-  else if (dato == 102) {
+  if (dato == 101) {
     parqueo3 = LOW;
   }
-
+  else if (dato == 102) {
+    parqueo3 = HIGH;
+  }
+  if (dato == 103) {
+    parqueo4 = LOW;
+  }
+  else if (dato == 104) {
+    parqueo4 = HIGH;
+  }
 
 
   if (LED1status)
