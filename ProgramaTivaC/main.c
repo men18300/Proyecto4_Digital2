@@ -40,6 +40,16 @@ int parqueo3=0;
 int parqueo4=0;
 
 
+//DISPLAY CODIGO
+//a - PB5
+//b - PB0
+//c- PA5
+//d- PA7
+//e- PA6
+//f- PE4
+//g-PE5
+//punto -PB4
+
 //Prototipo de funciones
 void UARTIntHandler(void); //funcion interrupcion cuando se recibe un dato por UART
 void InitUART(void); //funcion de configuracion UART
@@ -55,6 +65,7 @@ int main(void) {
     SysCtlClockSet(SYSCTL_SYSDIV_5| SYSCTL_USE_PLL| SYSCTL_XTAL_16MHZ);
 
     //Funcion de configuracion de UART0
+
     InitUART1();
 
     //Habilitar periférico GPIO F
@@ -66,49 +77,70 @@ int main(void) {
     //Habilitar pines de salida y entrada
     //Habilitar periférico GPIO C
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    //Habilitar pines de salida y entrada
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     //Habilitar pines de salida y entrada
 
-    GPIOPinConfigure(GPIO_PD6_WT5CCP0);
-    GPIOPinConfigure(GPIO_PC7_WT1CCP1);
+    GPIOPinConfigure(GPIO_PD6_WT5CCP0); //Entrada Parqueo 3
+    GPIOPinConfigure(GPIO_PC7_WT1CCP1); //Entrada Parqueo 2
+    GPIOPinConfigure(GPIO_PC6_WT1CCP0); //Entrada Parqueo 1
+    GPIOPinConfigure(GPIO_PB3_T3CCP1); //Salida Parqueo 4
+    GPIOPinConfigure(GPIO_PF2_T1CCP0); // Salida parqueo 2
+    GPIOPinConfigure(GPIO_PF3_TRCLK); //Salida parqueo 3
+    GPIOPinConfigure(GPIO_PA3_SSI0FSS); //Entrada Parqueo 4
+    GPIOPinConfigure(GPIO_PB2_T3CCP0); //Salida parqueo 1
+
+
 
 
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_2|GPIO_PIN_3);
+
+//SALIDAS DEL DISPLAY
+    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_7|GPIO_PIN_6|GPIO_PIN_5);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_1| GPIO_PIN_0|GPIO_PIN_5);
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_4|GPIO_PIN_5);
 
     GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4);
     //Configura los pushbuttoms con weak pull-up
 
   //  GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_7);
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_6);
+    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_6);
     GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_7);
+    GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_3);
     //Configura los pushbuttoms con weak pull-up
 
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_6, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_6, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-
-    //IntEnable(INT_UART2);
-    //IntMasterEnable();
-
+    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
 
     //loop infinito
     while (1){
                 //funcion de toggle del led
         status3 = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_6);
-        status1 = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4);
+        status1 = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_6);
         status2 = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_7);
+        status4 = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_3);
+        LEDsparqueo();
 
 
         if (status1prev!=status1){
             status1prev=status1;
             if (status1==0){
-                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8); //Rojo
+                        parqueo1=1;
                         UARTCharPut(UART1_BASE, 'a');
-                        //delayMs(1000);
+
                     }
                         else {
+                            parqueo1=0;
                             UARTCharPut(UART1_BASE, 'b');
-                          //  delayMs(500);
+
                         }
         }
 
@@ -116,13 +148,15 @@ int main(void) {
         if (status2prev!=status2){
             status2prev=status2;
             if (status2==0){
-          GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 6); //Rojo
-          UARTCharPut(UART1_BASE, 'c');
-          //delayMs(1000);
+                parqueo2=1;
+            //    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 6); //Rojo
+                UARTCharPut(UART1_BASE, 'c');
+
       }
       else {
+          parqueo2=0;
           UARTCharPut(UART1_BASE, 'd');
-         // delayMs(500);
+
       }
 
         }
@@ -130,21 +164,38 @@ int main(void) {
         if (status3prev!=status3){
             status3prev=status3;
             if (status3==0){
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 10); //amarillo
+                parqueo3=1;
                 UARTCharPut(UART1_BASE, 'e');
-             // delayMs(1000);
+
            }
-            else if (status3==1){
+            else{
+                parqueo3=0;
                 UARTCharPut(UART1_BASE, 'f');
-               // delayMs(500);
+
             }
 
 
         }
 
+        if (status4prev!=status4){
+                status4prev=status4;
+                if (status4==0){
+                    parqueo4=1;
+                    UARTCharPut(UART1_BASE, 'g');
+
+               }
+                else{
+                    parqueo4=0;
+                    UARTCharPut(UART1_BASE, 'h');
+
+                }
+
+
+            }
+
 
             else{
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0); //Rojo
+              //  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0); //Rojo
             }
 
     }
@@ -232,39 +283,71 @@ void UARTIntHandler(){
 
 
 void LEDsparqueo(void){
-    if(parqueo1== 1 ){
-
-
-    }
-    else if (parqueo1==0){
-
-
-    }
-    if(parqueo2==1){
-
-    }
-    else if (parqueo2==0){
-
-    }
-    if(parqueo3==1){
-
+    contador=0;
+    if(parqueo3== 1 ){
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0);
     }
     else if (parqueo3==0){
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+
 
     }
     if(parqueo4==1){
+        GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_3, 0);
 
     }
     else if (parqueo4==0){
+        GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_3, GPIO_PIN_3);
+
+    }
+    if(parqueo2==1){
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
+    }
+    else if (parqueo2==0){
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
+
+    }
+    if(parqueo1==1){
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2, 0);
+    }
+    else if (parqueo1==0){
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2, GPIO_PIN_2);
 
     }
 
     contador=parqueo1+parqueo2+parqueo3+parqueo4;
-    if (contador==0){}
-    else if (contador==2){}
-    else if (contador==3){}
-    else if (contador==4){}
-    else {}
+    if (contador==0){
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6|GPIO_PIN_7);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4|GPIO_PIN_5 );
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,0 );
+
+    }
+    else if (contador==1){
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4);
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,GPIO_PIN_4 );
+    }
+    else if (contador==2){
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7|GPIO_PIN_6|GPIO_PIN_5,GPIO_PIN_5);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_1|GPIO_PIN_0,0 );
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,GPIO_PIN_4 );
+    }
+    else if (contador==3){
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6|GPIO_PIN_7);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4|GPIO_PIN_5 );
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,0xFF );
+    }
+    else if (contador==4){
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_0,0 );
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,GPIO_PIN_5 );
+    }
+    else {
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7|GPIO_PIN_6|GPIO_PIN_5, 0xFF);
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_1|GPIO_PIN_0,0xFF );
+        GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,0xFF );
+
+    }
 }
 
 
