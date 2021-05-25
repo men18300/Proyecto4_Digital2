@@ -36,6 +36,7 @@ const char* password = "a4c564b0c0";  //Enter your Password here
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is default)
 
 int dato = 0;
+//Variables para indicar si un parqueo esta libre o ocupado
 bool parqueo1 = HIGH;
 bool parqueo2 = HIGH;
 bool parqueo3 = HIGH;
@@ -49,6 +50,7 @@ int contador = 0;
 // Configuración
 //************************************************************************************************
 void setup() {
+  //Configuro mis seriales
   Serial.begin(115200);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
 
@@ -93,30 +95,38 @@ void loop() {
   //Serial.println(contador);
   server.handleClient();
 
+  ///Leo y guardo lo que ingresa por mi UART2
   if (Serial2.available() > 0) {
     dato = Serial2.read();
     // Serial.println(Serial2.read());
     Serial.println(dato);
   }
 
-  if (dato == 97) {
+//Para Parqueo 1
+  if (dato == 97) { //Esta ocupado
     parqueo1 = LOW;
   }
   else if (dato == 98) {
-    parqueo1 = HIGH;
+    parqueo1 = HIGH; //Esta libre
   }
+
+  //Para Parqueo 2
   if (dato == 99) {
     parqueo2 = LOW;
   }
   else if (dato == 100) {
     parqueo2 = HIGH;
   }
+
+  //Para Parqueo 3
   if (dato == 101) {
     parqueo3 = LOW;
   }
   else if (dato == 102) {
     parqueo3 = HIGH;
   }
+
+  //Para Parqueo 4
   if (dato == 103) {
     parqueo4 = LOW;
   }
@@ -227,6 +237,7 @@ ptr += "</script>";
   //ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
   //ptr +=" <td> <span style='font-size:60px;'>&#10060;</span></td>";
 
+//Para Parqueo 1
   if (parqueo1 == HIGH) {
     ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
   }
@@ -234,6 +245,7 @@ ptr += "</script>";
     ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
   }
 
+//Para Parqueo 2
   if (parqueo2 == HIGH) {
    ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
   }
@@ -241,6 +253,7 @@ ptr += "</script>";
     ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
   }
 
+//Para Parqueo 3
   if (parqueo3 == HIGH) {
     ptr +=  "<td> <span style='font-size:60px;'> &#9989;</span></td>";
   }
@@ -248,6 +261,7 @@ ptr += "</script>";
     ptr += "<td> <span style='font-size:60px;'>&#10060;</span></td>";
   }
 
+//Para Parqueo 4
   if (parqueo4 == HIGH) {
     ptr += "<td> <span style='font-size:60px;'> &#9989;</span></td>";
   }
