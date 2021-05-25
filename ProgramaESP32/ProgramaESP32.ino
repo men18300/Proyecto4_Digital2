@@ -195,6 +195,17 @@ String SendHTML(uint8_t led1stat) {
   ptr += ".button-off:active {background-color: #2c3e50;}\n";
   ptr += "p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
   ptr += "</style>\n";
+  //Codigo para que la pagina se refresque cada 0.5 segundos
+ptr += "<script>\n";
+ptr += "<!--\n";
+ptr += "function timedRefresh(timeoutPeriod) {\n";
+ptr += "\tsetTimeout(\"location.reload(true);\",timeoutPeriod);\n";
+ptr += "}\n";
+ptr += "\n";
+ptr += "window.onload = timedRefresh(500);\n";
+ptr += "\n";
+ptr += "//   -->\n";
+ptr += "</script>";
   ptr += "</head>\n";
   ptr += "<body>\n";
   ptr += "<h1>ParqueoMatic-Prototipo &#128664</h1>\n";

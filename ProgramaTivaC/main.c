@@ -41,19 +41,19 @@ int parqueo4=0;
 
 
 //DISPLAY CODIGO
-//a - PB5
-//b - PB0
+//a- PB5
+//b- PB0
 //c- PA5
 //d- PA7
 //e- PA6
 //f- PE4
-//g-PE5
-//punto -PB4
+//g- PE5
+//.- PB4
 
 //Prototipo de funciones
 void UARTIntHandler(void); //funcion interrupcion cuando se recibe un dato por UART
-void InitUART(void); //funcion de configuracion UART
-void InitUART1(void);
+void InitUART(void); //funcion de configuracion UART 0
+void InitUART1(void); //funcion para configurar UART1 que es el que estarea utilizando
 void InitUART2(void);
 void LEDsparqueo(void);
 void delayMs(uint32_t ui32Ms);
@@ -61,26 +61,20 @@ void delayMs(uint32_t ui32Ms);
 
 //Main Loop
 int main(void) {
-    //Establecer reloj del microcontrolador a 40
+    //Establecer reloj del microcontrolador a 40 MGHZ
     SysCtlClockSet(SYSCTL_SYSDIV_5| SYSCTL_USE_PLL| SYSCTL_XTAL_16MHZ);
 
-    //Funcion de configuracion de UART0
-
+    //Funcion de configuracion de UART1
     InitUART1();
 
-    //Habilitar periférico GPIO F
+    //Habilitar periféricos que estare utilizando
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    //Habilitar pines de salida y entrada
-
-    //Habilitar periférico GPIO C
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    //Habilitar pines de salida y entrada
-    //Habilitar periférico GPIO C
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-    //Habilitar pines de salida y entrada
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+
     //Habilitar pines de salida y entrada
 
     GPIOPinConfigure(GPIO_PD6_WT5CCP0); //Entrada Parqueo 3
@@ -122,21 +116,27 @@ int main(void) {
 
     //loop infinito
     while (1){
-                //funcion de toggle del led
+        //Leelo todos los parqueos
         status3 = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_6);
         status1 = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_6);
         status2 = GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_7);
         status4 = GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_3);
+
+        //Funcion para encender los LEDs de rojo/verde y los del DISPLAY
         LEDsparqueo();
 
 
+        //Verifico si hay algun cambio
         if (status1prev!=status1){
+            //Si si lo hay, actualizo mi variable previa
             status1prev=status1;
+            //Si esta ocupado
             if (status1==0){
                         parqueo1=1;
                         UARTCharPut(UART1_BASE, 'a');
 
                     }
+            //Si esta libre
                         else {
                             parqueo1=0;
                             UARTCharPut(UART1_BASE, 'b');
@@ -240,14 +240,6 @@ void InitUART1(void){
     /* Sets the configuration of a UART. */
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
-  //  UARTEnable(UART1_BASE);
-   // UARTFIFOEnable(UART1_BASE);
-
-    //Habilitamos las interrupciones de UART
-   // UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
-
-    //LLamamos a la funcion de interrupcion
-   // UARTIntRegister(UART1_BASE ,UARTIntHandler);
 }
 
 
@@ -264,11 +256,7 @@ void InitUART2(void){
     /* Sets the configuration of a UART. */
     UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
-    //Habilitamos las interrupciones de UART
-   // UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
 
-    //LLamamos a la funcion de interrupcion
-   // UARTIntRegister(UART1_BASE ,UARTIntHandler);
 }
 
 
@@ -283,10 +271,13 @@ void UARTIntHandler(){
 
 
 void LEDsparqueo(void){
+    //Reseteo mi contador a 0
     contador=0;
+    //Si esta ocupado, apago verde y automaticamente se enciende rojo
     if(parqueo3== 1 ){
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0);
     }
+    //Si esta libre, enciende verde y automaticamente se apaga rojo
     else if (parqueo3==0){
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
 
@@ -315,28 +306,35 @@ void LEDsparqueo(void){
 
     }
 
+    //Verifico cuantos parqueos estan ocupados
     contador=parqueo1+parqueo2+parqueo3+parqueo4;
+    //Si estan todos libres, pongo 4
     if (contador==0){
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6|GPIO_PIN_7);
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4|GPIO_PIN_5 );
         GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,0 );
 
     }
+    //Pongo 3
     else if (contador==1){
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6);
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4);
         GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,GPIO_PIN_4 );
     }
+    //Pongo 2
     else if (contador==2){
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7|GPIO_PIN_6|GPIO_PIN_5,GPIO_PIN_5);
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_1|GPIO_PIN_0,0 );
         GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,GPIO_PIN_4 );
     }
+    //Pongo 1
     else if (contador==3){
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,GPIO_PIN_6|GPIO_PIN_7);
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0,GPIO_PIN_4|GPIO_PIN_5 );
         GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5|GPIO_PIN_4,0xFF );
     }
+
+    //Si estan todos ocupados, pongo 0
     else if (contador==4){
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0);
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_1|GPIO_PIN_0,0 );
